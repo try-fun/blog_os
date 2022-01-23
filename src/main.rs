@@ -1,28 +1,37 @@
 // src/main.rs
 
-#![no_std] // 不链接Rust标准库
-#![no_main] // 禁用所有Rust层级的入口点
+#![no_std] // don't link the Rust standard library
+#![no_main] // disable all Rust-level entry points
 
+mod vga_buffer;
 use core::panic::PanicInfo;
 
-/// 这个函数将在panic时被调用
+/// This function is called on panic.
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
     loop {}
 }
 
-static HELLO: &[u8] = b"Hello World!";
+// static HELLO: &[u8] = b"Hello World!";
 
-#[no_mangle]
+#[no_mangle] // don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
-    let vga_buffer = 0xb8000 as *mut u8;
+    // this function is the entry point, since the linker looks for a function
+    // named `_start` by default
 
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
-        }
-    }
+    // let vga_buffer = 0xb8000 as *mut u8;
+
+    // for (i, &byte) in HELLO.iter().enumerate() {
+    //     unsafe {
+    //         *vga_buffer.offset(i as isize * 2) = byte;
+    //         *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
+    //     }
+    // }
+
+    // vga_buffer::print_something();
+    println!("Hello World{}", "!");
+    panic!("Some panic message");
 
     loop {}
 }
