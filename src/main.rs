@@ -31,7 +31,32 @@ pub extern "C" fn _start() -> ! {
 
     // vga_buffer::print_something();
     println!("Hello World{}", "!");
-    panic!("Some panic message");
+
+    blog_os::init();
+
+    fn stack_overflow() {
+        stack_overflow(); // for each recursion, the return address is pushed
+    }
+    // uncomment line below to trigger a stack overflow
+    stack_overflow();
+    // // trigger a page fault
+    // unsafe {
+    //     *(0xdeadbeef as *mut u64) = 42;
+    // };
+    // // invoke a breakpoint exception
+    // x86_64::instructions::interrupts::int3();
+
+    // as before
+    #[cfg(test)]
+    test_main();
+
+    loop {
+        use blog_os::print;
+        print!("-"); // new
+    }
+
+    println!("It did not crash!");
+    blog_os::hlt_loop();
 
     loop {}
 }
