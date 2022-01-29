@@ -4,6 +4,21 @@ use x86_64::structures::tss::TaskStateSegment;
 use x86_64::VirtAddr;
 
 pub const DOUBLE_FAULT_IST_INDEX: u16 = 0;
+struct Selectors {
+    code_selector: SegmentSelector,
+    tss_selector: SegmentSelector,
+}
+
+pub fn init() {
+    use x86_64::instructions::segmentation::set_cs;
+    use x86_64::instructions::tables::load_tss;
+
+    GDT.0.load();
+    unsafe {
+        set_cs(GDT.1.code_selector);
+        load_tss(GDT.1.tss_selector);
+    }
+}
 
 lazy_static! {
     static ref TSS: TaskStateSegment = {
@@ -33,20 +48,4 @@ lazy_static! {
             },
         )
     };
-}
-
-struct Selectors {
-    code_selector: SegmentSelector,
-    tss_selector: SegmentSelector,
-}
-
-pub fn init() {
-    use x86_64::instructions::segmentation::set_cs;
-    use x86_64::instructions::tables::load_tss;
-
-    GDT.0.load();
-    unsafe {
-        set_cs(GDT.1.code_selector);
-        load_tss(GDT.1.tss_selector);
-    }
 }

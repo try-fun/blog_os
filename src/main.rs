@@ -10,7 +10,8 @@ use core::panic::PanicInfo;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    // loop {}
+    blog_os::hlt_loop();
 }
 
 // static HELLO: &[u8] = b"Hello World!";
@@ -34,11 +35,11 @@ pub extern "C" fn _start() -> ! {
 
     blog_os::init();
 
-    fn stack_overflow() {
-        stack_overflow(); // for each recursion, the return address is pushed
-    }
+    // fn stack_overflow() {
+    //     stack_overflow(); // for each recursion, the return address is pushed
+    // }
     // uncomment line below to trigger a stack overflow
-    stack_overflow();
+    // stack_overflow();
     // // trigger a page fault
     // unsafe {
     //     *(0xdeadbeef as *mut u64) = 42;
@@ -50,13 +51,12 @@ pub extern "C" fn _start() -> ! {
     #[cfg(test)]
     test_main();
 
-    loop {
-        use blog_os::print;
-        print!("-"); // new
-    }
-
     println!("It did not crash!");
-    blog_os::hlt_loop();
 
-    loop {}
+    // loop {
+    //     // use blog_os::print;
+    //     // for _ in 0..100000 {}
+    //     // print!("-");
+    // }
+    blog_os::hlt_loop();
 }
