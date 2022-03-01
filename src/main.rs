@@ -38,9 +38,9 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     // vga_buffer::print_something();
     // use blog_os::memory;
     // use blog_os::memory::BootInfoFrameAllocator;
-    use blog_os::allocator;
+    use blog_os::allocator::{self, HEAP_SIZE};
     use blog_os::memory::{self, BootInfoFrameAllocator};
-    use x86_64::{structures::paging::Page, VirtAddr};
+    use x86_64::VirtAddr;
 
     println!("Hello World{}", "!");
     blog_os::init();
@@ -56,11 +56,18 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println!("heap_value at {:p}", heap_value);
 
     // create a dynamically sized vector
-    let mut vec = Vec::new();
-    for i in 0..500 {
-        vec.push(i);
+    // let mut vec = Vec::new();
+    // for i in 0..HEAP_SIZE {
+    //     vec.push(i);
+    // }
+    // println!("vec at {:p}", vec.as_slice());
+
+    let long_lived = Box::new(1); // new
+    for i in 0..HEAP_SIZE {
+        let x = Box::new(i);
+        assert_eq!(*x, i);
     }
-    println!("vec at {:p}", vec.as_slice());
+    assert_eq!(*long_lived, 1); // new
 
     // create a reference counted vector -> will be freed when count reaches 0
     let reference_counted = Rc::new(vec![1, 2, 3]);
