@@ -7,8 +7,11 @@ extern crate alloc;
 
 mod vga_buffer;
 use alloc::{boxed::Box, rc::Rc, vec, vec::Vec};
+use blog_os::task::executor::Executor;
+use blog_os::task::keyboard;
+use blog_os::task::{simple_executor::SimpleExecutor, Task};
 use bootloader::{entry_point, BootInfo};
-use core::panic::PanicInfo;
+use core::panic::PanicInfo; // new // new
 
 /// This function is called on panic.
 #[panic_handler]
@@ -158,10 +161,32 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     println!("It did not crash!");
 
+    // let mut executor = SimpleExecutor::new();
+    // executor.spawn(Task::new(example_task()));
+    // executor.run();
+
+    let mut executor = Executor::new(); // new
+                                        // let mut executor = SimpleExecutor::new();
+    executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(keyboard::print_keypresses())); // new
+    executor.run();
+
     // loop {
     //     // use blog_os::print;
     //     // for _ in 0..100000 {}
     //     // print!("-");
     // }
+
     blog_os::hlt_loop();
+}
+
+// Below is the example_task function again so that you don't have to scroll up
+
+async fn async_number() -> u32 {
+    42
+}
+
+async fn example_task() {
+    let number = async_number().await;
+    println!("async number: {}", number);
 }
